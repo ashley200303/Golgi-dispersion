@@ -137,6 +137,17 @@ def analyze_particles_and_save(image_path, roi_zip_path, output_dir):
         for filename, data in roi_zip_bytes.items():
             zf.writestr(filename, data)
 
+    # 파일 탐색기 열기
+    try:
+        if sys.platform == "win32":
+            os.startfile(output_dir)
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", output_dir])
+        else:
+            subprocess.Popen(["xdg-open", output_dir])
+    except Exception as e:
+        print(f"탐색기 열기 실패: {e}")
+        
     print(f"완료: {len(results)}개 ROI 분석 및 저장 완료 → {output_dir}")
 
 if __name__ == "__main__":
