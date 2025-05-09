@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 import zipfile
 import sys
-import csv
-import io
 from PIL import Image
 from read_roi import read_roi_file, read_roi_zip
 from roifile import ImagejRoi
