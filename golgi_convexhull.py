@@ -11,6 +11,7 @@ from PIL import Image
 from read_roi import read_roi_file, read_roi_zip
 from roifile import ImagejRoi
 from tkinter import filedialog, simpledialog, messagebox
+from scalebar_detection import get_scale_info
 
 # 분석되지 않은 ROI가 있을 시 log에 저장됨
 LOG_PATH = "unsupported_rois.log"
@@ -24,7 +25,7 @@ def select_files_and_folder():
     output_dir = filedialog.askdirectory(title="결과 저장 폴더 선택")
     return image_path, roi_zip_path, output_dir
 
-# scale bar 자동화
+''' scale bar 자동화
 def detect_scale_bar(image, min_length=30):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image.copy()
     _, thresh = cv2.threshold(gray, 250, 255, cv2.THRESH_BINARY)
@@ -33,7 +34,7 @@ def detect_scale_bar(image, min_length=30):
         x, y, w, h = cv2.boundingRect(cnt)
         if w > min_length and h < w * 0.2:
             return w
-    return None
+    return None '''
 
 def ask_real_scale_length():
     root = tk.Tk()
@@ -81,15 +82,19 @@ def analyze_particles_and_save(image_path, roi_zip_path, output_dir):
     image = np.array(Image.open(image_path).convert("RGB"))
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-    # Scale bar detection
-    scale_bar_px = detect_scale_bar(image)
-    if not scale_bar_px:
-        messagebox.showerror("스케일 바 감지 실패", "이미지에서 스케일 바를 감지하지 못했습니다.")
-        sys.exit(1)
+    # Scale bar detection (auto or manual)
+    pixels_per_um, scale_bar_px, real_length = get_scale_info(image)
+    scale_ratio = 1 / pixels_per_um  # µm/px
+    print(f"[INFO] 스케일 바: {scale_bar_px}px = {real_length}µm → {scale_ratio:.3f} µm/px")
 
-    scale_bar_um = ask_real_scale_length()
-    scale_ratio = scale_bar_um / scale_bar_px
-    print(f"[INFO] 스케일 바: {scale_bar_px}px = {scale_bar_um}µm → {scale_ratio:.3f} µm/px")
+    # 결과 저장
+    scale_output_dir = os.path.join(output_dir, "scale_output")
+    os.makedirs(scale_output_dir, exist_ok=True)
+    scale_path = os.path.join(scale_output_dir, "pixels_per_um.txt")
+    with open(scale_path, "w") as f:
+        f.write(f"Pixels per micron: {pixels_per_um:.6f} px/µm\n")
+        f.write(f"Scale bar length (in pixels): {scale_bar_px:.2f} px\n")
+        f.write(f"Real scale bar length: {real_length:.2f} µm\n")
 
     roi_dict = read_roi_zip(roi_zip_path)
     results = []
