@@ -25,17 +25,6 @@ def select_files_and_folder():
     output_dir = filedialog.askdirectory(title="결과 저장 폴더 선택")
     return image_path, roi_zip_path, output_dir
 
-''' scale bar 자동화
-def detect_scale_bar(image, min_length=30):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if image.ndim == 3 else image.copy()
-    _, thresh = cv2.threshold(gray, 250, 255, cv2.THRESH_BINARY)
-    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    for cnt in contours:
-        x, y, w, h = cv2.boundingRect(cnt)
-        if w > min_length and h < w * 0.2:
-            return w
-    return None '''
-
 def ask_real_scale_length():
     root = tk.Tk()
     root.withdraw()
