@@ -42,7 +42,7 @@ def roi_to_mask(roi, shape):
         points = np.array(list(zip(roi["x"], roi["y"])), np.int32)
         if roi_type == "polygon":
             cv2.fillPoly(mask, [points], 255)
-        else:  # freehand
+        else:  # freehand인 경우
             cv2.polylines(mask, [points], isClosed=True, color=255, thickness=1)
             cv2.fillPoly(mask, [points], 255)
     elif roi_type in ("rect", "rectangle") and all(k in roi for k in ["left", "top", "width", "height"]):

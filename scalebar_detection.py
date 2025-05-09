@@ -100,8 +100,8 @@ def main():
         real_length = float(input("스케일 바의 실제 길이 (µm): "))
         pixels_per_um = scale_bar_px / real_length
         print(f"자동 감지: {pixels_per_um:.4f} px/µm")
+    # 2단계: 수동 감지
     else:
-        # 2단계: 수동 감지
         pixels_per_um, scale_bar_px, real_length = manual_scale_bar_detection(image)
         print(f"수동 감지: {pixels_per_um:.4f} px/µm")
 
